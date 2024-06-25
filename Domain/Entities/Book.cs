@@ -13,5 +13,9 @@ namespace Domain.Entities
         public string Author { get; set; }
         public int Copies { get; set; }
         public int AvaibleCopies { get; set; }
+        public bool Active { get; set; }
+        public bool Deleted { get; set; }
+        public DateTime? DateDeleted { get; set; }
+        public string? WhoDeleted { get; set; }
     }
 }
