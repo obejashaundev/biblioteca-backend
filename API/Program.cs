@@ -7,6 +7,8 @@ using System.Text;
 using API.Models;
 using Domain.Entities;
 using Infrastructure.Data;
+using Application.Interfaces;
+using Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,9 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
+
+// Adding dependencies configuration
+builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
