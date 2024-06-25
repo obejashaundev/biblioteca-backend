@@ -17,5 +17,7 @@ namespace Domain.Entities
         public bool Deleted { get; set; }
         public DateTime? DateDeleted { get; set; }
         public string? WhoDeleted { get; set; }
+
+        public virtual ICollection<BookLoan> BooksLoans { get; set; }
     }
 }
