@@ -11,6 +11,8 @@ namespace Application.Interfaces
     {
         Task AddAsync(Book book);
         Task DeleteAsync(int id, string userId);
+        Task UpdateAsync(Book oldBook);
+        Task UpdateAvaibleCopiesAsync(int id, int avaibleCopies);
         Task<IEnumerable<Book>> GetAllAsync();
         Task<Book> FindByIdAsync(int id);
     }

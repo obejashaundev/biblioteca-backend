@@ -49,5 +49,26 @@ namespace Infrastructure.Repositories
             var listBooks = _db.Books.Where(x => x.Active && !x.Deleted).AsNoTracking().AsEnumerable();
             return listBooks ?? Enumerable.Empty<Book>();
         }
+
+        public async Task UpdateAsync(Book oldBook)
+        {
+            var book = _db.Books.FirstOrDefault(x => x.Id == oldBook.Id);
+            if (book is not null)
+            {
+                book.Title = oldBook.Title;
+                book.Author = oldBook.Author;
+                await _db.SaveChangesAsync();
+            }
+        }
+
+        public async Task UpdateAvaibleCopiesAsync(int id, int avaibleCopies)
+        {
+            var book = await _db.Books.FirstOrDefaultAsync(x => x.Id == id);
+            if (book is not null)
+            {
+                book.AvaibleCopies = avaibleCopies;
+                await _db.SaveChangesAsync();
+            }
+        }
     }
 }
