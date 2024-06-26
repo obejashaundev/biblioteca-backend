@@ -10,7 +10,10 @@ namespace Application.Interfaces
     public interface IBooksLoansRepository
     {
         Task<IEnumerable<BookLoan>> GetAllAsync();
-        Task AddBookLoan(BookLoan bookLoan);
+        Task<BookLoan> FindByIdAsync(int id);
+        Task Add(BookLoan bookLoan);
+        Task DeleteAsync(int id, string userId);
+        Task UpdateReturnDateAsync(int id, DateTime? returnDate);
         Task ReturnBookLoan(int id, string userId);
     }
 }
