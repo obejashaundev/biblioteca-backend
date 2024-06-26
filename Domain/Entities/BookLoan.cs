@@ -19,7 +19,7 @@ namespace Domain.Entities
         public DateTime LoanDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public bool Returned { get; set; }
-        public string WhoReceived { get; set; }
+        public string? WhoReceived { get; set; }
         public DateTime? RealReturnDate { get; set; }
         public bool Active { get; set; }
         public bool Deleted { get; set; }

@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using API.Models;
+using Application.Interfaces;
 using Domain.Entities;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -28,43 +29,64 @@ namespace API.Controllers
             return Ok(booksLoans);
         }
 
-        [HttpPost("new")]
-        public async Task<ActionResult> NewBookLoan(int bookId, int personId, DateTime? returnDate)
+        [HttpPost("add")]
+        public async Task<ActionResult> Add([FromBody] BookLoanModel bookLoan)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new
+                {
+                    Message = "Entries are required.",
+                    Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
+                });
+            }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return BadRequest(new { Message = "Can't find operation user" });
-            var book = await _bookRepository.FindByIdAsync(bookId);
+            var hasAnyCopy = await _booksLoansRepository.HasAnyCopyAsync(bookLoan.PersonId, bookLoan.BookId);
+            if (hasAnyCopy) return BadRequest(new { Message = "The person has a book copy not returned" });
+            var book = await _bookRepository.FindByIdAsync(bookLoan.BookId);
             if (book is not null && book.Active && !book.Deleted && book.AvaibleCopies > 0 && book.Copies > 0)
             {
-                var bookLoan = new BookLoan { BookId = bookId, PersonId = personId, LoanDate = DateTime.Now, ReturnDate = returnDate, WhoLent = userId, Active = true, Deleted = false };
-                await _booksLoansRepository.Add(bookLoan);
-                await _bookRepository.UpdateAvaibleCopiesAsync(bookId, book.AvaibleCopies - 1);
+                var newBookLoan = new BookLoan { BookId = bookLoan.BookId, PersonId = bookLoan.PersonId, LoanDate = DateTime.Now, ReturnDate = bookLoan.ReturnDate, WhoLent = userId, Active = true, Deleted = false };
+                await _booksLoansRepository.AddAsync(newBookLoan);
+                await _bookRepository.UpdateAvaibleCopiesAsync(bookLoan.BookId, book.AvaibleCopies - 1);
                 return Ok(bookLoan);
             }
             return BadRequest(new { Message = "The book is not avaible." });
         }
 
-        [HttpDelete("remove/{id}")]
-        public async Task<ActionResult> DeleteBookLoan(int id)
+        [HttpDelete("{id}/remove")]
+        public async Task<ActionResult> Delete(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return BadRequest(new { Message = "Can't find operation user" });
             var bookLoan = await _booksLoansRepository.FindByIdAsync(id);
             if (bookLoan is not null)
             {
-                await _bookRepository.UpdateAvaibleCopiesAsync(bookLoan.BookId, bookLoan.Book.AvaibleCopies + 1);
-                await _booksLoansRepository.DeleteAsync(id, userId);
-                return Ok();
+                var book = await _bookRepository.FindByIdAsync(bookLoan.BookId);
+                if (book is not null)
+                {
+                    await _bookRepository.UpdateAvaibleCopiesAsync(bookLoan.BookId, book.AvaibleCopies + 1);
+                    await _booksLoansRepository.DeleteAsync(id, userId);
+                    return Ok();
+                }
             }
             return BadRequest(new { Message = "Can't find loan" });
         }
 
-        [HttpPatch("return/{id}")]
+        [HttpPatch("{id}/return")]
         public async Task<ActionResult> ReturnBook(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId)) return BadRequest(new { Message = "Can't find operation user" });
             await _booksLoansRepository.ReturnBookLoan(id, userId);
+            return Ok();
+        }
+
+        [HttpPatch("{id}/updateReturnDate")]
+        public async Task<ActionResult> UpdateReturnDate(int id, [FromBody] UpdateReturnDateModel model)
+        {
+            await _booksLoansRepository.UpdateReturnDateAsync(id, model.returnDate);
             return Ok();
         }
     }

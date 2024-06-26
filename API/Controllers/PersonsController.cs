@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using API.Models;
+using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -36,8 +37,8 @@ namespace API.Controllers
             return Ok(person);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Add(Person person)
+        [HttpPost("add")]
+        public async Task<ActionResult> Add([FromBody] PersonModel person)
         {
             if (!ModelState.IsValid)
             {
@@ -47,14 +48,13 @@ namespace API.Controllers
                     Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
                 });
             }
-            person.Active = true;
-            person.Deleted = false;
-            await _personRepository.AddAsync(person);
+            var newPerson = new Person { FullName = person.FullName, Email = person.Email, CellPhone = person.CellPhone, Active = true, Deleted = false };
+            await _personRepository.AddAsync(newPerson);
             return Ok();
         }
 
-        [HttpPut]
-        public async Task<ActionResult> Update(Person person)
+        [HttpPut("{id}")]
+        public async Task<ActionResult> Update(int id, [FromBody] PersonModel person)
         {
             if (!ModelState.IsValid)
             {
@@ -64,7 +64,8 @@ namespace API.Controllers
                     Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
                 });
             }
-            await _personRepository.UpdateAsync(person);
+            var oldPerson = new Person { Id = id, FullName = person.FullName, Email = person.Email, CellPhone = person.CellPhone, Active = true, Deleted = false };
+            await _personRepository.UpdateAsync(oldPerson);
             return Ok();
         }
 

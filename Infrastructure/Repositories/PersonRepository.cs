@@ -25,8 +25,8 @@ namespace Infrastructure.Repositories
 
         public async Task DeleteAsync(int id, string userId)
         {
-            var person = _db.Persons.FirstOrDefault(x => x.Id == id);
-            if (person != null)
+            var person = _db.Persons.FirstOrDefault(x => x.Id == id && x.Active && !x.Deleted);
+            if (person is not null)
             {
                 person.WhoDeleted = userId;
                 person.Deleted = true;
@@ -38,7 +38,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Person> FindByIdAsync(int id)
         {
-            var person = _db.Persons.AsNoTracking().FirstOrDefault(x => x.Id == id);
+            var person = _db.Persons.AsNoTracking().FirstOrDefault(x => x.Id == id && x.Active && !x.Deleted);
             return person;
         }
 
@@ -50,8 +50,8 @@ namespace Infrastructure.Repositories
 
         public async Task UpdateAsync(Person oldPerson)
         {
-            var person = _db.Persons.FirstOrDefault(x => x.Id == oldPerson.Id);
-            if (person != null)
+            var person = _db.Persons.FirstOrDefault(x => x.Id == oldPerson.Id && x.Active && !x.Deleted);
+            if (person is not null)
             {
                 person.FullName = oldPerson.FullName;
                 person.Email = oldPerson.Email;
