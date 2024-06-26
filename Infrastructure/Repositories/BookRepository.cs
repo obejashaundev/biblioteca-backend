@@ -27,7 +27,7 @@ namespace Infrastructure.Repositories
 
         public async Task DeleteAsync(int id, string userId)
         {
-            var book = _db.Books.FirstOrDefault(x => x.Id == id);
+            var book = _db.Books.FirstOrDefault(x => x.Id == id && x.Active && !x.Deleted);
             if (book != null)
             {
                 book.WhoDeleted = userId;
@@ -40,7 +40,7 @@ namespace Infrastructure.Repositories
 
         public async Task<Book> FindByIdAsync(int id)
         {
-            var book = await _db.Books.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var book = await _db.Books.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id && x.Active && !x.Deleted);
             return book;
         }
 
@@ -52,7 +52,7 @@ namespace Infrastructure.Repositories
 
         public async Task UpdateAsync(Book oldBook)
         {
-            var book = _db.Books.FirstOrDefault(x => x.Id == oldBook.Id);
+            var book = _db.Books.FirstOrDefault(x => x.Id == oldBook.Id && x.Active && !x.Deleted);
             if (book is not null)
             {
                 book.Title = oldBook.Title;

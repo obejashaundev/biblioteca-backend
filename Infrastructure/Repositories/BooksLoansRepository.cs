@@ -18,7 +18,7 @@ namespace Infrastructure.Repositories
             _db = db;
         }
 
-        public async Task Add(BookLoan bookLoan)
+        public async Task AddAsync(BookLoan bookLoan)
         {
             _db.BookLoans.Add(bookLoan);
             await _db.SaveChangesAsync();
@@ -47,6 +47,11 @@ namespace Infrastructure.Repositories
         {
             var loansBooks = _db.BookLoans.Where(x =>  x.Active && !x.Deleted && !x.Returned).AsNoTracking().AsEnumerable();
             return loansBooks ?? Enumerable.Empty<BookLoan>();
+        }
+
+        public async Task<bool> HasAnyCopyAsync(int personId, int bookId)
+        {
+            return await _db.BookLoans.AnyAsync(x => x.PersonId == personId && x.BookId == bookId && !x.Returned && x.Active && !x.Deleted);
         }
 
         public async Task ReturnBookLoan(int id, string userId)
