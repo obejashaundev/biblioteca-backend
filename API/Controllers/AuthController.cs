@@ -24,6 +24,16 @@ namespace API.Controllers
             _signInManager = signInManager;
         }
 
+        [Authorize]
+        [HttpGet("verify")]
+        public async Task<ActionResult> Verify()
+        {
+            return Ok(new
+            {
+                isAuthenticated = true
+            });
+        }
+
         [HttpPost("register")]
         public async Task<ActionResult> Register(RegisterModel model)
         {
