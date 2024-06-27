@@ -57,6 +57,8 @@ namespace Infrastructure.Repositories
             {
                 book.Title = oldBook.Title;
                 book.Author = oldBook.Author;
+                book.Copies = oldBook.Copies;
+                book.AvaibleCopies = oldBook.AvaibleCopies;
                 await _db.SaveChangesAsync();
             }
         }

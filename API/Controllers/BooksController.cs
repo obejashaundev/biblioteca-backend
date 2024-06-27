@@ -65,7 +65,7 @@ namespace API.Controllers
                     Errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))
                 });
             }
-            var oldBook = new Book { Id = id, Title = book.Title, Author = book.Author, Copies = book.Copies, AvaibleCopies = book.Copies, Active = true, Deleted = false };
+            var oldBook = new Book { Id = id, Title = book.Title, Author = book.Author, Copies = book.Copies, AvaibleCopies = book.AvaibleCopies, Active = true, Deleted = false };
             await _bookRepository.UpdateAsync(oldBook);
             return Ok();
         }
