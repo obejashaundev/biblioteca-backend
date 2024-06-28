@@ -16,17 +16,33 @@ namespace API.Controllers
     {
         private readonly IBooksLoansRepository _booksLoansRepository;
         private readonly IBookRepository _bookRepository;
-        public BooksLoansController(IBooksLoansRepository booksLoansRepository, IBookRepository bookRepository)
+        private readonly IPersonRepository _personRepository;
+        public BooksLoansController(IBooksLoansRepository booksLoansRepository, IBookRepository bookRepository, IPersonRepository personRepository)
         {
             _booksLoansRepository = booksLoansRepository;
             _bookRepository = bookRepository;
+            _personRepository = personRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Book>>> GetAll()
         {
-            var booksLoans = await _booksLoansRepository.GetAllAsync();
-            return Ok(booksLoans);
+            var loans = await _booksLoansRepository.GetAllAsync();
+            List<dynamic> lsLoans = new();
+            foreach (var loan in loans)
+            {
+                var book = await _bookRepository.FindByIdAsync(loan.Id);
+                var person = await _personRepository.FindByIdAsync(loan.PersonId);
+                lsLoans.Add(new
+                {
+                    loan.Id,
+                    person.FullName,
+                    person.Email,
+                    person.CellPhone,
+                    book.Title
+                });
+            }
+            return Ok(lsLoans);
         }
 
         [HttpPost("add")]

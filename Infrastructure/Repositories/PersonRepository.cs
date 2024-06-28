@@ -48,6 +48,12 @@ namespace Infrastructure.Repositories
             return listPersons ?? Enumerable.Empty<Person>();
         }
 
+        public async Task<IEnumerable<Person>> GetMatchPersonAsync(string searchedText)
+        {
+            var lsPersons = await _db.Persons.Where(x => (x.FullName.Contains(searchedText, StringComparison.InvariantCultureIgnoreCase) || x.Email.Contains(searchedText, StringComparison.InvariantCultureIgnoreCase) || x.CellPhone.Contains(searchedText, StringComparison.InvariantCultureIgnoreCase)) && x.Active && !x.Deleted).AsNoTracking().ToListAsync();
+            return lsPersons ?? Enumerable.Empty<Person>();
+        }
+
         public async Task UpdateAsync(Person oldPerson)
         {
             var person = _db.Persons.FirstOrDefault(x => x.Id == oldPerson.Id && x.Active && !x.Deleted);

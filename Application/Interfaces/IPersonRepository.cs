@@ -14,6 +14,7 @@ namespace Application.Interfaces
         Task DeleteAsync(int id, string userId);
         Task UpdateAsync(Person oldPerson);
         Task<IEnumerable<Person>> GetAllAsync();
+        Task<IEnumerable<Person>> GetMatchPersonAsync(string searchedText);
         Task<Person> FindByIdAsync(int id);
     }
 }
