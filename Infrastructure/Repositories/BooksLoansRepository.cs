@@ -45,7 +45,7 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<BookLoan>> GetAllAsync()
         {
-            var loansBooks = _db.BookLoans.Where(x =>  x.Active && !x.Deleted && !x.Returned).AsNoTracking().AsEnumerable();
+            var loansBooks = _db.BookLoans.Where(x =>  x.Active && !x.Deleted && !x.Returned).AsEnumerable();
             return loansBooks ?? Enumerable.Empty<BookLoan>();
         }
 

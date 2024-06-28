@@ -50,6 +50,12 @@ namespace Infrastructure.Repositories
             return listBooks ?? Enumerable.Empty<Book>();
         }
 
+        public async Task<IEnumerable<Book>> GetMatchBookAsync(string searchedText)
+        {
+            var lsBooks = await _db.Books.Where(x => (x.Title.Contains(searchedText, StringComparison.InvariantCultureIgnoreCase) || x.Author.Contains(searchedText, StringComparison.InvariantCultureIgnoreCase)) && x.Active && !x.Deleted).AsNoTracking().ToListAsync();
+            return lsBooks ?? Enumerable.Empty<Book>();
+        }
+
         public async Task UpdateAsync(Book oldBook)
         {
             var book = _db.Books.FirstOrDefault(x => x.Id == oldBook.Id && x.Active && !x.Deleted);

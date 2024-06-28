@@ -14,6 +14,7 @@ namespace Application.Interfaces
         Task UpdateAsync(Book oldBook);
         Task UpdateAvaibleCopiesAsync(int id, int avaibleCopies);
         Task<IEnumerable<Book>> GetAllAsync();
+        Task<IEnumerable<Book>> GetMatchBookAsync(string searchedText);
         Task<Book> FindByIdAsync(int id);
     }
 }

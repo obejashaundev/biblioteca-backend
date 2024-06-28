@@ -26,6 +26,26 @@ namespace API.Controllers
             return Ok(persons);
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Book>>> GetList(string query)
+        {
+            var result = Enumerable.Empty<dynamic>();
+            query = API.Utilities.FormatString(query);
+            if (string.IsNullOrEmpty(query) || query.Length < 3)
+            {
+                goto SendResponse;
+            }
+            var lsPersons = await _personRepository.GetMatchPersonAsync(searchedText: query);
+            if (lsPersons is null || lsPersons.Count() == 0) goto SendResponse;
+            result = lsPersons.Select(x => new {
+                value = x.Id.ToString(),
+                label = x.FullName
+            }).ToList();
+
+            SendResponse:
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<Person>>> Get(int id)
         {

@@ -15,7 +15,7 @@ namespace API.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
-        public BooksController(IBookRepository bookRepository) 
+        public BooksController(IBookRepository bookRepository)
         {
             _bookRepository = bookRepository;
         }
@@ -25,6 +25,26 @@ namespace API.Controllers
         {
             var books = await _bookRepository.GetAllAsync();
             return Ok(books);
+        }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Book>>> GetList(string query)
+        {
+            var result = Enumerable.Empty<dynamic>();
+            query = API.Utilities.FormatString(query);
+            if (string.IsNullOrEmpty(query) || query.Length < 3)
+            {
+                goto SendResponse;
+            }
+            var lsBooks = await _bookRepository.GetMatchBookAsync(searchedText: query);
+            if (lsBooks is null || lsBooks.Count() == 0) goto SendResponse;
+            result = lsBooks.Select(x => new
+            {
+                value = x.Id.ToString(),
+                label = x.Title
+            }).ToList();
+        SendResponse:
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
